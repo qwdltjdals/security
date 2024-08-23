@@ -40,8 +40,24 @@ public class AuthenticationController { // 인증 관련 요청들이 여기 들
     public ResponseEntity<?> signin(
             @Valid @RequestBody ReqSigninDto dto,
             BeanPropertyBindingResult bindingResult) {
-        signinService.signin(dto);
-        return ResponseEntity.ok().body(null);
+        return ResponseEntity.ok().body(signinService.signin(dto));
     }
 }
 // transaction : 과정 중에서 하나의 단계라도 실패하면 전부 롤백
+
+/**
+ *      클라이언트 - 요청날리고 응답받을 대상
+ *      요청
+ *      tomcat - Req, Resp만들어줌(객체) - Http프로토콜에 의해서 만들어짐
+ *      디스페쳐서블릿으로 가야하는데
+ *      필터 걸림 - JWT검사 - 필터가 걸릴지 말지는 저어기 /**로 걸어둔곳에서 결정
+ *      SecurityContextHolder - 응답되면 사라짐 / 토큰에서 넣어서 동작하게 해줘야함(라이프사이클 : 요청 ~ 응답)
+ *      그래서 모든 요청마다 토큰을 넣어줘야함
+ *      통과하면 이동
+ *      서블릿
+ *      이동
+ *      컨트롤러
+ *
+ *      Security라이브러리 : 커다란 필터 덩어리
+ *      그 안에 필터 하나 추가해준거?
+ */

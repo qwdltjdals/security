@@ -1,5 +1,7 @@
 package com.study.springSecurity.config;
 
+import com.study.springSecurity.security.filter.JwtAccessTokenFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -7,10 +9,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity      // 우리가 만든 securityConfig를 적용시키겠다.
 @Configuration // Ioc 컨테이너에 Bean으로 들어감 Bean등록 가능
 public class SecurityConfig extends WebSecurityConfigurerAdapter { // 추상클래스 상속 시킴 - 추상메소드가 있냐 없냐?
+
+    @Autowired
+    private JwtAccessTokenFilter jwtAccessTokenFilter;
 
     @Bean // Bean 만듦 - 컴포넌트 등록
     public BCryptPasswordEncoder passwordEncoder() {
@@ -30,7 +36,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter { // 추상클�
         http.csrf().disable();
         // 위조방지 스티커(토큰)
         http.authorizeRequests()
-                .antMatchers("/auth/**", "/h2-console/**", "/test/**") // antMatchers = 주소를 선택할 수 있음
+                .antMatchers("/auth/**", "/h2-console/**") // antMatchers = 주소를 선택할 수 있음
                 .permitAll() // 위에있는 모든것들을 인가 없이 사용해라
                 .anyRequest() // 다른 모든 요청들
                 .authenticated() // 인가를 거쳐라
@@ -38,6 +44,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter { // 추상클�
                 .headers()
                 .frameOptions()
                 .disable();
+        http.addFilterBefore(jwtAccessTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        // 유저네임 뭐시기 필터 실행되기 이전에 저 필터 실행
     }
 }
 

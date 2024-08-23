@@ -1,11 +1,13 @@
 package com.study.springSecurity.domain.entity;
 
+import com.study.springSecurity.security.principal.PrincipalUser;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -36,5 +38,17 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id") // role_id = Role에 id - user_id에 있는 권한(role_id)를 다 가져옴
     )
     private Set<Role> roles; // roles = user_roles // 중복제거를 위해서 Set으로 받음
+
+//    @OneToMany(mappedBy = "user")
+//    private Set<UserRole> userRoles = new HashSet<>(); // HashSet 초기화 - nullpoint가 안뜨게 하기 위해서
+
+    public PrincipalUser toPrincipalUser() {
+        return PrincipalUser.builder()
+                .userId(id)
+                .username(username)
+                .password(password)
+                .roles(roles)
+                .build();
+    }
 
 }
