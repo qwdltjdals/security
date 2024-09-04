@@ -2,7 +2,7 @@ import { css } from '@emotion/react';
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { singupApi } from '../../apis/signupApi';
-import { oauth2MergeApi } from '../../apis/oauth2Api';
+import { oauth2JoinApi, oauth2MergeApi } from '../../apis/oauth2Api';
 /** @jsxImportSource @emotion/react */
 
 const layout = css`
@@ -179,7 +179,19 @@ function OAuth2JoinPage(props) {
     }
 
     const handleJoinSubmitOnClick = async () => {
+        const joinUser = {
+            ...inputUser,
+            oauth2Name: searchParams.get("oAuth2Name"),
+            provider: searchParams.get("provider")
+        }
 
+        const joinData = await oauth2JoinApi(joinUser);
+        if(!joinData.isSuccess) {
+            showFieldErrorMessage(joinData.fieldErrors);
+            return;
+        }
+        alert("회원가입이 완료되었습니다");
+        navigate("/user/login");
     }
 
     const handleSelectMenu = (e) => {

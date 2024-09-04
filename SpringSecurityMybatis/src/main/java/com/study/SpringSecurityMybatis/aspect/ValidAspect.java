@@ -1,5 +1,6 @@
 package com.study.SpringSecurityMybatis.aspect;
 
+import com.study.SpringSecurityMybatis.dto.request.ReqOauth2JoinDto;
 import com.study.SpringSecurityMybatis.dto.request.ReqSignupDto;
 import com.study.SpringSecurityMybatis.entity.User;
 import com.study.SpringSecurityMybatis.exception.ValidException;
@@ -38,6 +39,9 @@ public class ValidAspect {
         switch (proceedingJoinPoint.getSignature().getName()) { // 이 validation 체크를 어디서 사용할건지
             case "signup": // signup이 아니면 실행할 필요 없음
                 validSignupDto(args, bindingResult);
+                break;
+            case "oAuth2signup":
+                validOAuth2JoinDto(args, bindingResult);
                 break;
         }
 
@@ -78,8 +82,26 @@ public class ValidAspect {
                             = new FieldError("username", "username", "이미 존재하는 사용자 이름 입니다.");
                     bindingResult.addError(fieldError);
                 }
-                break;
                 }
             }
         }
+    private void validOAuth2JoinDto(Object[] args, BeanPropertyBindingResult bindingResult) {
+        for(Object arg : args) {
+            if(arg.getClass() == ReqOauth2JoinDto.class) {
+                ReqOauth2JoinDto dto = (ReqOauth2JoinDto) arg;
+
+                if(!dto.getPassword().equals(dto.getCheckPassword())) {
+                    FieldError fieldError
+                            = new FieldError("checkPassword", "checkPassword" , "비밀번호가 일치하지 않습니다.");
+                    bindingResult.addError(fieldError);
+                }
+
+                if(userService.isDuplicateUsername(dto.getUsername())) {
+                    FieldError fieldError
+                            = new FieldError("username", "username", "이미 존재하는 사용자 이름 입니다.");
+                    bindingResult.addError(fieldError);
+                }
+            }
+        }
+    }
     }

@@ -31,10 +31,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private OAuth2Service oAuth2Service;
 
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+
 
 
     @Override // ctrl + o
@@ -47,8 +44,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors(); // WebMvcConfig 설정을 따라감
 
         http.oauth2Login()
-                .successHandler(oauth2SuccessHandler)
-                .userInfoEndpoint()
+                .successHandler(oauth2SuccessHandler) // 핸들러랑 연결
+                .userInfoEndpoint() // 이때 유저 로그인 정보를 가져옴 -> Oauth2UserRequest로 가져옴
                 .userService(oAuth2Service);
 
         http.exceptionHandling().authenticationEntryPoint(authenticationHandler); // eAuthentication오류가 터지면 ㅁ원래 403오류가 나는데 이제 이리로 갈거임
